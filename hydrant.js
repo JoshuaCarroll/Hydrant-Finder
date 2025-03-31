@@ -35,30 +35,13 @@ function rotateArrow() {
 }
 
 function handleOrientation(event) {
-    let heading = null;
-
-    if (event.absolute || event.webkitCompassHeading) {
-        // iOS
-        heading = event.webkitCompassHeading;
-    } else if (event.alpha !== null) {
-        // Android
-        heading = 360 - event.alpha;
-    }
-
-    if (heading !== null) {
-        currentHeading = heading;
-
-        // Rotate arrow
-        rotateArrow();
-
-        // Rotate compass ring in the opposite direction
-        const compassRing = document.getElementById("compass-ring");
-        if (compassRing) {
-            compassRing.style.transform = `rotate(${-heading}deg)`;
-        }
-    }
+  if (event.absolute || event.webkitCompassHeading) {
+    currentHeading = event.webkitCompassHeading;
+  } else if (event.alpha !== null) {
+    currentHeading = 360 - event.alpha;
+  }
+  rotateArrow();
 }
-
 
 function requestOrientationAccess() {
   if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -157,34 +140,4 @@ function startTracking() {
 	}, { enableHighAccuracy: true });
 }
 
-function requestCompassPermissionIfNeeded(startCompassCallback) {
-    const buttonContainer = document.getElementById("compass-permission");
-    const button = document.getElementById("enable-compass");
-
-    const isIOSWithPermissionAPI = typeof DeviceOrientationEvent !== "undefined" &&
-                                   typeof DeviceOrientationEvent.requestPermission === "function";
-
-    if (isIOSWithPermissionAPI) {
-        buttonContainer.classList.remove("hidden");
-
-        button.addEventListener("click", async () => {
-            try {
-                const response = await DeviceOrientationEvent.requestPermission();
-                if (response === "granted") {
-                    buttonContainer.classList.add("hidden");
-                    startCompassCallback();
-                } else {
-                    alert("Compass access denied. Please enable motion and orientation access in Settings.");
-                }
-            } catch (err) {
-                console.error("Compass permission error:", err);
-                alert("Error requesting compass permission.");
-            }
-        });
-    } else {
-        // Not iOS or doesn't require permission — start immediately
-        startCompassCallback();
-    }
-}
-
-requestCompassPermissionIfNeeded(startTracking);
+startTracking();
