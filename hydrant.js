@@ -35,12 +35,28 @@ function rotateArrow() {
 }
 
 function handleOrientation(event) {
-  if (event.absolute || event.webkitCompassHeading) {
-     currentHeading = event.webkitCompassHeading;
-   } else if (event.alpha !== null) {
-     currentHeading = 360 - event.alpha;
-   }
-   rotateArrow();
+    let heading = null;
+
+    if (event.absolute || event.webkitCompassHeading) {
+        // iOS
+        heading = event.webkitCompassHeading;
+    } else if (event.alpha !== null) {
+        // Android
+        heading = 360 - event.alpha;
+    }
+
+    if (heading !== null) {
+        currentHeading = heading;
+
+        // Rotate arrow
+        rotateArrow();
+
+        // Rotate compass ring in the opposite direction
+        const compassRing = document.getElementById("compass-ring");
+        if (compassRing) {
+            compassRing.style.transform = `rotate(${-heading}deg)`;
+        }
+    }
 }
 
 
