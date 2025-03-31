@@ -18,10 +18,14 @@
   <h1 class="text-3xl font-bold mb-4">Hydrant Finder</h1>
   <p id="status" class="text-sm mb-2">Locating...</p>
   <p id="info" class="text-base mb-4"></p>
-  <div class="relative w-64 h-64">
-    <div class="absolute inset-0 rounded-full border-4 border-gray-600"></div>
-    <div id="arrow" class="absolute top-1/2 left-1/2 text-6xl transform -translate-x-1/2 -translate-y-full origin-bottom">⬆️</div>
-  </div>
+	<div class="relative w-64 h-64 mx-auto my-8">
+	  <img src="compass-ring.png" class="absolute inset-0 w-full h-full" alt="Compass Ring" />
+	  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+		<div id="arrow" class="text-6xl transition-transform duration-100" style="transform-origin: center;">
+		  ⬆️
+		</div>
+	  </div>
+	</div>
   <button onclick="requestOrientationAccess()" class="mt-6 px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700">Enable Compass</button>
 </body>
 </html>

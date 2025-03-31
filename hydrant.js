@@ -2,6 +2,8 @@ let currentHeading = null;
 let hydrantBearing = null;
 let lastLat = null;
 let lastLon = null;
+let lastHydrant = null;
+let lastLatLon = null;
 const DISTANCE_THRESHOLD = 50; // meters
 
 function toRadians(deg) { return deg * Math.PI / 180; }
@@ -113,23 +115,29 @@ function startTracking() {
     return;
   }
 
-  navigator.geolocation.watchPosition(async (position) => {
-    const lat = position.coords.latitude;
-    const lon = position.coords.longitude;
-    document.getElementById('status').innerText = `Your location: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+	navigator.geolocation.watchPosition(async (pos) => {
+		const lat = pos.coords.latitude;
+		const lon = pos.coords.longitude;
 
-    if (!lastLat || haversine(lat, lon, lastLat, lastLon) > DISTANCE_THRESHOLD) {
-      lastLat = lat;
-      lastLon = lon;
-      await findNearestHydrant(lat, lon);
-    }
-  }, (err) => {
-    document.getElementById('status').innerText = `Geolocation error: ${err.message}`;
-  }, {
-    enableHighAccuracy: true,
-    maximumAge: 10000,
-    timeout: 10000
-  });
+		// Recalculate distance every time
+		if (lastHydrant) {
+			const newDistance = haversine(lat, lon, lastHydrant.latitude, lastHydrant.longitude);
+			document.getElementById('info').innerText =
+				`Hydrant is ${Math.round(newDistance * 3.28084)} ft away at ${lastHydrant.bearing_deg.toFixed(0)}°`;
+		}
+
+		// Re-fetch hydrant only if moved more than 50 meters
+		if (!lastLatLon || haversine(lat, lon, lastLatLon.lat, lastLatLon.lon) > DISTANCE_THRESHOLD) {
+			lastHydrant = await findNearestHydrant(lat, lon);
+			lastLatLon = { lat, lon };
+			if (lastHydrant) {
+				document.getElementById('info').innerText =
+					`Hydrant is ${Math.round(lastHydrant.distance_feet)} ft away at ${lastHydrant.bearing_deg.toFixed(0)}°`;
+			}
+		}
+	}, (err) => {
+		console.error("Geolocation error", err);
+	}, { enableHighAccuracy: true });
 }
 
 startTracking();
