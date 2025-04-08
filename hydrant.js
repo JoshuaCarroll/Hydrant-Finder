@@ -48,6 +48,7 @@ function requestOrientationAccess() {
     DeviceOrientationEvent.requestPermission().then(response => {
       if (response === 'granted') {
         window.addEventListener('deviceorientation', handleOrientation, true);
+	document.getElementById('btnEnableCompass').style.display = 'none';
       } else {
         alert("Permission denied for compass.");
       }
@@ -113,6 +114,9 @@ function startTracking() {
   if (!navigator.geolocation) {
     document.getElementById('status').innerText = 'Geolocation not supported.';
     return;
+  }
+  else {
+    document.getElementById('status').innerText = '';
   }
 
 	navigator.geolocation.watchPosition(async (pos) => {
